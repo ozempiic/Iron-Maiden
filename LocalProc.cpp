@@ -36,37 +36,37 @@ LONG WINAPI Exceptioner(_EXCEPTION_POINTERS *ExceptionInfo)
 
 int main()
 {
-	AddVectoredExceptionHandler(1, Exceptioner);
-	CONTEXT ctx;
-	ctx.ContextFlags = CONTEXT_FULL;
-	
-	HANDLE hProcess = GetModuleHandleA(NULL);
-	if(!hProcess)
-	{
-		std::cout << "[-] Failed to get handle!!";
-		exit(-1);
-	}
+    AddVectoredExceptionHandler(1, Exceptioner);
+    CONTEXT ctx;
+    ctx.ContextFlags = CONTEXT_FULL;
 
-	int tid = GetThreadID(GetCurrentProcessId());
-	if(tid == -1)
-	{
-		std::cout << "[-] Failed to get Thread ID";
-		CloseHandle(hProcess);
-		exit(-1);
-	}
-	
-	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, false, tid);
-	if(!hThread)
-	{
-		std::cout << "[-] Failed to open thread";
-		CloseHandle(hProcess);
-		exit(-1);
-	}
-	
-	GetThreadContext(hThread, &ctx);
-	ctx.Rip = (DWORD64)nullptr;
-	SetThreadContext(hThread, &ctx);
-	
-	CloseHandle(hProcess);
-	CloseHandle(hThread);
+    HANDLE hProcess = GetModuleHandleA(NULL);
+    if (!hProcess)
+    {
+        std::cout << "[-] Failed to get handle!!";
+        exit(-1);
+    }
+
+    int tid = GetThreadID(GetCurrentProcessId());
+    if (tid == -1)
+    {
+        std::cout << "[-] Failed to get Thread ID";
+        CloseHandle(hProcess);
+        exit(-1);
+    }
+
+    HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, false, tid);
+    if (!hThread)
+    {
+        std::cout << "[-] Failed to open thread";
+        CloseHandle(hProcess);
+        exit(-1);
+    }
+
+    GetThreadContext(hThread, &ctx);
+    ctx.Eip = (DWORD)nullptr; // Set Eip for 32-bit architecture
+    SetThreadContext(hThread, &ctx);
+
+    CloseHandle(hProcess);
+    CloseHandle(hThread);
 }
